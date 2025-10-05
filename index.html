@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Calificaciones por Materia</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <!-- Pantalla de Login -->
+    <div id="login-screen" class="screen">
+        <div class="login-container">
+            <div class="card">
+                <div class="card__body">
+                    <h1 class="login-title">Sistema de Calificaciones</h1>
+                    <p class="login-subtitle">Acceso para Docentes</p>
+                    
+                    <form id="login-form" class="login-form">
+                        <div class="form-group">
+                            <label for="login-username" class="form-label">Usuario</label>
+                            <input type="text" id="login-username" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password" class="form-label">Contraseña</label>
+                            <input type="password" id="login-password" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn--primary btn--full-width">Iniciar Sesión</button>
+                    </form>
+                    
+                    <div class="login-divider">
+                        <span>¿No tienes cuenta?</span>
+                    </div>
+                    
+                    <button id="show-register" class="btn btn--secondary btn--full-width">Crear Cuenta Nueva</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla de Registro -->
+    <div id="register-screen" class="screen hidden">
+        <div class="login-container">
+            <div class="card">
+                <div class="card__body">
+                    <h1 class="login-title">Registro de Docente</h1>
+                    
+                    <form id="register-form" class="login-form">
+                        <div class="form-group">
+                            <label for="register-name" class="form-label">Nombre Completo</label>
+                            <input type="text" id="register-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-username" class="form-label">Usuario</label>
+                            <input type="text" id="register-username" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password" class="form-label">Contraseña</label>
+                            <input type="password" id="register-password" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password-confirm" class="form-label">Confirmar Contraseña</label>
+                            <input type="password" id="register-password-confirm" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn--primary btn--full-width">Crear Cuenta</button>
+                    </form>
+                    
+                    <button id="back-to-login" class="btn btn--outline btn--full-width">Volver al Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla Principal -->
+    <div id="main-screen" class="screen hidden">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="container">
+                <div class="header-content">
+                    <h1 class="header-title">Sistema de Calificaciones</h1>
+                    <div class="header-user">
+                        <span id="teacher-name" class="teacher-greeting"></span>
+                        <button id="logout-btn" class="btn btn--outline btn--sm">Cerrar Sesión</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navegación -->
+        <nav class="main-nav">
+            <div class="container">
+                <div class="nav-tabs">
+                    <button class="nav-tab active" data-tab="students">Estudiantes</button>
+                    <button class="nav-tab" data-tab="subjects">Materias</button>
+                    <button class="nav-tab" data-tab="grades">Calificaciones</button>
+                    <button class="nav-tab nav-tab--highlight" data-tab="reports">Reportes por Materia</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Contenido Principal -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Tab de Estudiantes -->
+                <div id="students-tab" class="tab-content active">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Gestión de Estudiantes</h3>
+                            <span id="students-count" class="item-counter">0 estudiantes</span>
+                        </div>
+                        <div class="card__body">
+                            <form id="student-form" class="add-form">
+                                <div class="form-group">
+                                    <label for="student-name" class="form-label">Nombre del Estudiante</label>
+                                    <input type="text" id="student-name" class="form-control" placeholder="Ingrese el nombre completo" required>
+                                </div>
+                                <button type="submit" class="btn btn--primary">Agregar Estudiante</button>
+                            </form>
+                            <div id="students-list" class="items-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab de Materias -->
+                <div id="subjects-tab" class="tab-content hidden">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Gestión de Materias</h3>
+                            <span id="subjects-count" class="item-counter">0 materias</span>
+                        </div>
+                        <div class="card__body">
+                            <form id="subject-form" class="add-form">
+                                <div class="form-group">
+                                    <label for="subject-name" class="form-label">Nombre de la Materia</label>
+                                    <input type="text" id="subject-name" class="form-control" placeholder="Ingrese el nombre de la materia" required>
+                                </div>
+                                <button type="submit" class="btn btn--primary">Agregar Materia</button>
+                            </form>
+                            <div id="subjects-list" class="items-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab de Calificaciones -->
+                <div id="grades-tab" class="tab-content hidden">
+                    <div class="card">
+                        <div class="card__header">
+                            <h3>Matriz de Calificaciones</h3>
+                            <p class="text-secondary">Complete las calificaciones de los 3 parciales (0-10)</p>
+                        </div>
+                        <div class="card__body">
+                            <div id="grades-matrix" class="grades-container">
+                                <div class="empty-state">
+                                    <p>Agrega estudiantes y materias para comenzar a calificar</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab de Reportes por Materia -->
+                <div id="reports-tab" class="tab-content hidden">
+                    <div class="reports-grid">
+                        <!-- Selector de Materia -->
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Seleccionar Materia</h3>
+                            </div>
+                            <div class="card__body">
+                                <div class="form-group">
+                                    <label for="subject-selector" class="form-label">Materia a Reportar</label>
+                                    <select id="subject-selector" class="form-control">
+                                        <option value="">-- Seleccione una materia --</option>
+                                    </select>
+                                </div>
+                                <div class="report-actions">
+                                    <button id="generate-pdf-btn" class="btn btn--primary btn--full-width" disabled>
+                                        📊 Generar Reporte PDF
+                                    </button>
+                                    <button id="print-report-btn" class="btn btn--secondary btn--full-width" disabled>
+                                        🖨️ Imprimir Reporte
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vista Previa -->
+                        <div class="card">
+                            <div class="card__header">
+                                <h3>Vista Previa del Reporte</h3>
+                            </div>
+                            <div class="card__body">
+                                <div id="report-preview">
+                                    <div class="empty-preview">
+                                        <p>Seleccione una materia para ver la vista previa del reporte</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estadísticas Generales -->
+                    <div class="card mt-24">
+                        <div class="card__header">
+                            <h3>Estadísticas de la Materia Seleccionada</h3>
+                        </div>
+                        <div class="card__body">
+                            <div id="subject-stats" class="stats-grid">
+                                <div class="stat-card stat-total">
+                                    <div class="stat-value" id="total-students-stat">-</div>
+                                    <div class="stat-label">Total Estudiantes</div>
+                                </div>
+                                <div class="stat-card stat-approved">
+                                    <div class="stat-value" id="approved-students-stat">-</div>
+                                    <div class="stat-label">Aprobados</div>
+                                </div>
+                                <div class="stat-card stat-extraordinary">
+                                    <div class="stat-value" id="extraordinary-students-stat">-</div>
+                                    <div class="stat-label">Extraordinario</div>
+                                </div>
+                                <div class="stat-card stat-failed">
+                                    <div class="stat-value" id="failed-students-stat">-</div>
+                                    <div class="stat-label">Reprobados</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Mensajes de Notificación -->
+    <div id="notification" class="notification hidden">
+        <div class="notification-content">
+            <span id="notification-message"></span>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
